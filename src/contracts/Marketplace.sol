@@ -21,6 +21,14 @@ contract Marketplace {
         bool purchased
     );
 
+    event ProductPurchased(
+        uint id,
+        string name,
+        uint price,
+        address payable owner,
+        bool purchased
+    );
+
     constructor() public {
         name = "Tech University Marketplace";
     }
@@ -38,6 +46,24 @@ contract Marketplace {
     }
 
     function purchaseProduct(uint _id) public payable {
+        //we don't want to store this on chain to save costs
+        Product memory _product = products[_id];
 
+        address payable _seller = _product.owner;
+
+        require(_product.id > 0 && _product.id <= productCount, 'product id must be valid');
+        require(msg.value >= _product.price, 'make sure there is enough ether');
+        require(!_product.purchased, 'product must not be purchased');
+        require(_seller != msg.sender, 'seller cannot be buyer');
+
+        //transfer ownership to buyer
+        _product.owner = msg.sender;
+        _product.purchased = true;
+        products[_id] = _product;
+
+        //pay the seller by sending them ether
+        address(_seller).transfer(msg.value);
+
+        emit ProductPurchased(productCount, _product.name, _product.price, msg.sender, true);
     }
 }

@@ -9,7 +9,7 @@ contract Marketplace {
         uint id;
         string name;
         uint price;
-        address owner;
+        address payable owner;
         bool purchased;
     }
 
@@ -17,7 +17,7 @@ contract Marketplace {
         uint id,
         string name,
         uint price,
-        address owner,
+        address payable owner,
         bool purchased
     );
 
@@ -35,5 +35,9 @@ contract Marketplace {
         products[productCount] = Product(productCount, _name, _price, msg.sender, false);
 
         emit ProductCreated(productCount, _name, _price, msg.sender, false);
+    }
+
+    function purchaseProduct(uint _id) public payable {
+
     }
 }
